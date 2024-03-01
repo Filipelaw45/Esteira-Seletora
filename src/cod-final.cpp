@@ -99,6 +99,14 @@ void loop() {
     
     peca = (chaveMetal() ? "metal" : "plastico");
 
+    if(digitalRead(SC)){
+        Serial.print("\nsensor capacitivo ativado");
+    }
+
+    if(digitalRead(SI)){
+        Serial.print("\nsensor indutivo ativado");
+    }
+
     if (digitalRead(CHL)) {
         if (chavePlastico()) filtroTamanho();
         if (chaveMetal()) filtroTamanho();
