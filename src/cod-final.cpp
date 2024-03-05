@@ -35,9 +35,9 @@ void ativarPistao(int pin) { digitalWrite(pin, HIGH); };
 
 void desativarPistao(int pin) { digitalWrite(pin, LOW); };
 
-bool chavePlastico() { return (digitalRead(CHS) == LOW && digitalRead(SC) && digitalRead(SI) == LOW); };
+// bool chavePlastico() { return (digitalRead(CHS) == LOW && peca == "plastico"); };
 
-bool chaveMetal() { return (digitalRead(CHS) && digitalRead(SC) && digitalRead(SI)); };
+// bool chaveMetal() { return (digitalRead(CHS) == HIGH && peca == "metal"); };
 
 void contarPeca(String peca) {
     if (digitalRead(SSA) || digitalRead(SSM) || !digitalRead(SSB) || digitalRead(SD)){
@@ -50,7 +50,6 @@ void contarPeca(String peca) {
 
         qtdPecasSelecionadas = calcTotal(qtdPecasMetalicas, qtdPecasPlasticas);
         qtdPecasRejeitadas = calcTotal(qtdPecasMetalRejeitadas, qtdPecasPlastRejeitadas);
-        peca = "";
 
         Serial.print("\nmetal Selecionada = " + String(qtdPecasMetalicas));
         Serial.print("\nplastico Selecionada = " + String(qtdPecasPlasticas));
@@ -102,14 +101,28 @@ void setup() {
 
 void loop() {
     
-    peca = (chaveMetal() ? "metal" : "plastico");
+    if(digitalRead(CHS) == HIGH && digitalRead(SC) == HIGH && digitalRead(SI) == HIGH){
+        peca = "metal";
+    }
 
-    // talvez seja necessário encapsular o cod abaixo em um while e 
-    // verificar se a peça foi selecionada em algum dos sensores, só testando pra saber
+    if(digitalRead(CHS) == LOW && digitalRead(SC) == HIGH && digitalRead(SI) == LOW){
+        peca = "plastico";
+    }
 
-    if (digitalRead(CHL)) {
-        if (chavePlastico()) filtroTamanho();
-        if (chaveMetal()) filtroTamanho();
+    if(digitalRead(SSA) || digitalRead(SSM) || digitalRead(SSB) || digitalRead(SD)){
+        saiu = true;
+    }
+
+
+    if (digitalRead(CHL)) {  
+            
+        if (peca == "metal" || peca == "plastico"){
+            while(!saiu){
+                filtroTamanho();
+            }
+        }
+        
         contarPeca(peca);
+        
     }
 }
