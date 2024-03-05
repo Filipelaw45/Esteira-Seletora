@@ -1,5 +1,7 @@
 #include <Arduino.h>
 
+// acho q tem algum pino analógico confirma com o professor
+
 #define SC 0
 #define SI 1
 #define SA 2
@@ -12,6 +14,9 @@
 #define A1 9
 #define A2 10
 #define A3 11
+
+//trocar os dois pinos abaixo de chave seletora e de chave de liga/desliga
+// para a que o professor colocou no arduino
 #define CHL 12
 #define CHS 13
 
@@ -22,18 +27,17 @@ int qtdPecasPlastRejeitadas = 0;
 int qtdPecasSelecionadas = 0;
 int qtdPecasRejeitadas = 0;
 
-
 String peca = "";
 
 int calcTotal(int a, int b) { return a + b; };
 
-auto ativarPistao(int pin) { digitalWrite(pin, HIGH); };
+void ativarPistao(int pin) { digitalWrite(pin, HIGH); };
 
-auto desativarPistao(int pin) { digitalWrite(pin, LOW); };
+void desativarPistao(int pin) { digitalWrite(pin, LOW); };
 
-auto chavePlastico() { return (digitalRead(CHS) == LOW && digitalRead(SC) == HIGH && digitalRead(SI) == LOW); };
+bool chavePlastico() { return (digitalRead(CHS) == LOW && digitalRead(SC) && digitalRead(SI) == LOW); };
 
-auto chaveMetal() { return (digitalRead(CHS) == HIGH && digitalRead(SC) == HIGH && digitalRead(SI) == HIGH); };
+bool chaveMetal() { return (digitalRead(CHS) && digitalRead(SC) && digitalRead(SI)); };
 
 void contarPeca(String peca) {
     if (digitalRead(SSA) || digitalRead(SSM) || !digitalRead(SSB) || digitalRead(SD)){
@@ -46,6 +50,7 @@ void contarPeca(String peca) {
 
         qtdPecasSelecionadas = calcTotal(qtdPecasMetalicas, qtdPecasPlasticas);
         qtdPecasRejeitadas = calcTotal(qtdPecasMetalRejeitadas, qtdPecasPlastRejeitadas);
+        peca = "";
 
         Serial.print("\nmetal Selecionada = " + String(qtdPecasMetalicas));
         Serial.print("\nplastico Selecionada = " + String(qtdPecasPlasticas));
@@ -99,13 +104,8 @@ void loop() {
     
     peca = (chaveMetal() ? "metal" : "plastico");
 
-    if(digitalRead(SC)){
-        Serial.print("\nsensor capacitivo ativado");
-    }
-
-    if(digitalRead(SI)){
-        Serial.print("\nsensor indutivo ativado");
-    }
+    // talvez seja necessário encapsular o cod abaixo em um while e 
+    // verificar se a peça foi selecionada em algum dos sensores, só testando pra saber
 
     if (digitalRead(CHL)) {
         if (chavePlastico()) filtroTamanho();

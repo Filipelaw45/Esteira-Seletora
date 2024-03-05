@@ -1,3 +1,7 @@
+#include <Arduino.h>
+// acho q tem algum pino analógico confirma com o professor
+// se der testa esse código aqui com as mesmas modificações do outro cod
+
 #define SC 0
 #define SI 1
 #define SA 2
@@ -10,6 +14,8 @@
 #define A1 9
 #define A2 10
 #define A3 11
+
+//trocar pinos abaixo
 #define CHL 12
 #define CHS 13
 
@@ -26,16 +32,16 @@ bool saiu = false;
 
 int calcTotal(int a, int b) { return a + b; };
 
-auto ativarPistao(int pin) { digitalWrite(pin, HIGH); };
+void ativarPistao(int pin) { digitalWrite(pin, HIGH); };
 
-auto desativarPistao(int pin) { digitalWrite(pin, LOW); };
+void desativarPistao(int pin) { digitalWrite(pin, LOW); };
 
-auto chavePlastico() { return (digitalRead(CHS) == LOW && digitalRead(SC) == HIGH && digitalRead(SI) == LOW); };
+bool chavePlastico() { return (digitalRead(CHS) == LOW && digitalRead(SC) == HIGH && digitalRead(SI) == LOW); };
 
-auto chaveMetal() { return (digitalRead(CHS) == HIGH && digitalRead(SC) == HIGH && digitalRead(SI) == HIGH); };
+bool chaveMetal() { return (digitalRead(CHS) == HIGH && digitalRead(SC) == HIGH && digitalRead(SI) == HIGH); };
 
 void contarPeca(String peca) {
-    if (digitalRead(SSA) || digitalRead(SSM) || digitalRead(SSB) || digitalRead(SD)){
+    if (digitalRead(SSA) || digitalRead(SSM) || !digitalRead(SSB) || digitalRead(SD)){
 
         if (peca == "metal" && !digitalRead(SD)) qtdPecasMetalicas++;
         if (peca == "plastico" && !digitalRead(SD)) qtdPecasPlasticas++;
@@ -67,7 +73,7 @@ void filtroTamanho() {
     if (digitalRead(SSM)) desativarPistao(A2);
 
     if (digitalRead(SB)) ativarPistao(A3);
-    if (digitalRead(SSB)) desativarPistao(A3);
+    if (!digitalRead(SSB)) desativarPistao(A3);
 }
 
 void setup() {
@@ -97,9 +103,11 @@ void setup() {
 void loop() {
     
     peca = (chaveMetal() ? "metal" : "plastico");
-    if(digitalRead(SSA) || digitalRead(SSM) || digitalRead(SSB) || digitalRead(SD)){
-        saiu = true
+    if(digitalRead(SSA) || digitalRead(SSM) || !digitalRead(SSB) || digitalRead(SD)){
+        saiu = true;
     }
+
+    // o teste do while bem tosco, deve estar incompleto.
 
 
     if (digitalRead(CHL)) {
